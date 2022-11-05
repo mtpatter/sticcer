@@ -1,4 +1,6 @@
 {
+  "carb_aware_uri": "https://carbon-aware-api.azurewebsites.net/",
+  "carb_aware_uri_NOTE": "works during hackathon duration",
   "prometheus_uri": "http://host.docker.internal:9090/",
   "prometheus_uri_local": "http://localhost:9090/",
   "container_group_list": ["dashgroup", "mlflowgroup"],

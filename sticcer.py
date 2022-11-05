@@ -46,17 +46,17 @@ def get_prom_metric(prometheus_uri, query):
 
 
 # carb aware helpers
-def get_loc_current_carb(location):
+def get_loc_current_carb(carb_aware_uri, location):
     if type(location) == str:
         emissions_current_query = {"location": [location]}
-        resp = requests.get("https://carbon-aware-api.azurewebsites.net/emissions/bylocations?",
+        resp = requests.get(carb_aware_uri + "/emissions/bylocations?",
                             params=emissions_current_query)
         carbon_intensity = resp.json()[0]["rating"]
         return carbon_intensity
 
     elif type(location) == list:
         emissions_current_query = {"location": location}
-        resp = requests.get("https://carbon-aware-api.azurewebsites.net/emissions/bylocations?",
+        resp = requests.get(carb_aware_uri + "/emissions/bylocations?",
                             params=emissions_current_query)
         carbon_intensities = {resp.json()[x]["location"]: resp.json()[x]["rating"] for x in range(len(location))}
         return carbon_intensities
@@ -66,6 +66,7 @@ def main(args):
     with open(args.config, "r") as f:
         json_config = json.load(f)
 
+    carb_aware_uri = json_config["carb_aware_uri"]
     prometheus_uri = json_config["prometheus_uri"]
     container_groups = json_config["container_group_list"]
     location_list = json_config["location_list"]
@@ -250,7 +251,7 @@ def main(args):
     def update_total_numbers(n_intervals):
         query = 'sum(sum_over_time(container_cpu_usage_seconds_total[1d]))'
         prom = get_prom_metric(prometheus_uri, query)
-        current_carb = get_loc_current_carb(current_location)
+        current_carb = get_loc_current_carb(carb_aware_uri, current_location)
         # prom = cpusecs/day x convert_g_per_hour |  */ 0.000277778
         emissions = float(prom) * float(current_carb) * 2.10 / 6000 / 86400  # TODO: should be actual location not current
 
@@ -279,8 +280,8 @@ def main(args):
         prom = get_prom_metric(prometheus_uri, query)
 
         # carb aware: carbon intensity in gCO2/kWh
-        carbs_dict = get_loc_current_carb(location_list)
-        current_carb = get_loc_current_carb(current_location)
+        carbs_dict = get_loc_current_carb(carb_aware_uri, location_list)
+        current_carb = get_loc_current_carb(carb_aware_uri, current_location)
         average_carb = sum(carbs_dict.values())/len(carbs_dict)
         optimal_carb = min(carbs_dict.values())  # TODO get optimal location for legend label
 
@@ -333,7 +334,7 @@ def main(args):
         proms = [float(get_prom_metric(prometheus_uri, q)) for q in queries]
 
         # carb aware: carbon intensity in gCO2/kWh
-        carb = get_loc_current_carb(region_group)  # TODO change to actual forecast time
+        carb = get_loc_current_carb(carb_aware_uri, region_group)  # TODO change to actual forecast time
         vals = [float(prom) * float(carb) * convert_g_per_hour for prom in proms]
         #rate_vals = [val/n_hour for val, n_hour in zip(vals, n_hours)]
         fig = {'data': [{'x': x_hours,
