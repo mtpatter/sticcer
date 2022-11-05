@@ -1,5 +1,7 @@
 # sticcer
-Sustainable Tech Insights and Cloud Carbon Efficiency Reporting
+<img src="sticcer.png" width="100">
+
+STICCER: Sustainable Tech Insights and Cloud Carbon Efficiency Reporting
 
 
 Start Prometheus and friends to monitor containers with label sticcer=GROUP_NAME.
