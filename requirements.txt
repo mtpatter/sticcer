@@ -1,0 +1,5 @@
+dash==2.6.2
+mlflow==1.29.0
+pendulum==2.1.2
+prometheus-api-client==0.5.2
+dash-bootstrap-components

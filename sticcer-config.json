@@ -1,0 +1,9 @@
+{
+  "prometheus_uri": "http://host.docker.internal:9090/",
+  "prometheus_uri_local": "http://localhost:9090/",
+  "container_group_list": ["dashgroup", "mlflowgroup"],
+  "pytz_timezone": "US/Eastern",
+  "location": "eastus",
+  "location_list": ["eastus", "eastus2", "westus", "westus2"],
+  "location_TODO": "Get from workspace"
+}
